@@ -15,6 +15,12 @@ DATABASE = 'database.db'
 # Set your OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+JOB_DESCRIPTION_PROMPT = """
+Generate job event data including job_title, company_name, job_description, cover_letter, tech_stack, job_duty_summary, and date_posted 
+based on the provided job description. If you don't find the information in the given job description, just output none. 
+Output the data in JSON format.
+"""
+
 # Initialize database (run once to create table)
 def init_db():
     with sqlite3.connect(DATABASE) as conn:
@@ -51,9 +57,7 @@ def generate_job_event_data(job_description):
         messages=[
             {
                 "role": "system",
-                "content": """Generate job event data including job_title, company_name, job_description, cover_letter, tech_stack, 
-                job_duty_summary, and date_posted based on the provided job description. Output the data in JSON format.
-                """
+                "content": JOB_DESCRIPTION_PROMPT
             },
             {
                 "role": "user",
@@ -61,7 +65,6 @@ def generate_job_event_data(job_description):
             }
         ],
         temperature=1,
-        max_tokens=2048,
         top_p=1,
         frequency_penalty=0,
         presence_penalty=0,
@@ -85,7 +88,7 @@ def add_event():
         job_title = job_event_data['job_title']
         company_name = job_event_data['company_name']
         cover_letter = job_event_data['cover_letter']
-        tech_stack = ','.join(job_event_data['tech_stack'])  # Convert list to comma-separated string
+        tech_stack = ','.join(job_event_data['tech_stack']) if job_event_data['tech_stack'] else None  # Convert list to comma-separated string or set to None
         job_duty_summary = job_event_data['job_duty_summary']
         date_posted = job_event_data['date_posted']
 
@@ -112,6 +115,14 @@ def index():
 def view_cover_letter(event_id):
     job_event = query_db('SELECT * FROM job_events WHERE id = ?', [event_id], one=True)
     return render_template('view_cover_letter.html', job_event=job_event)
+
+@app.route('/delete/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM job_events WHERE id = ?', (event_id,))
+        conn.commit()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     init_db()
