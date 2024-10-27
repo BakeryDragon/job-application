@@ -1,7 +1,9 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for
+from openai import OpenAI
 import openai
 import os
+import json
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -37,16 +39,47 @@ def query_db(query, args=(), one=False):
         rv = cursor.fetchall()
         return (rv[0] if rv else None) if one else rv
 
+# Function to call OpenAI API and generate job event data
+def generate_job_event_data(job_description):
+    client = OpenAI()
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {
+                "role": "system",
+                "content": "Generate job event data including job_title, company_name, job_description, and cover_letter based on the provided job description. Output the result in json format."
+            },
+            {
+                "role": "user",
+                "content": job_description
+            }
+        ],
+        temperature=1,
+        max_tokens=2048,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+        response_format={
+            "type": "json_object"
+        }
+    )
+    
+    data = json.loads(response.choices[0].message.content.strip())
+    return data
+
 # Route to create a new job application event
 @app.route('/add', methods=['GET', 'POST'])
 def add_event():
     if request.method == 'POST':
-        job_title = request.form['job_title']
-        company_name = request.form['company_name']
         job_description = request.form['job_description']
 
-        # Generate cover letter using OpenAI API
-        cover_letter = generate_cover_letter(job_description)
+        # Generate job event data using OpenAI API
+        job_event_data = generate_job_event_data(job_description)
+        
+        job_title = job_event_data['job_title']
+        company_name = job_event_data['company_name']
+        cover_letter = job_event_data['cover_letter']
 
         # Insert into database
         with sqlite3.connect(DATABASE) as conn:
@@ -71,15 +104,6 @@ def index():
 def view_cover_letter(event_id):
     job_event = query_db('SELECT * FROM job_events WHERE id = ?', [event_id], one=True)
     return render_template('view_cover_letter.html', job_event=job_event)
-
-# Function to call OpenAI API and generate cover letter
-def generate_cover_letter(job_description):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"Write a cover letter for the following job description:\n\n{job_description}",
-        max_tokens=250
-    )
-    return response.choices[0].text.strip()
 
 if __name__ == '__main__':
     init_db()

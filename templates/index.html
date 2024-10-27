@@ -2,30 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Job Applications</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <h1>Job Applications</h1>
-    <a href="{{ url_for('add_event') }}">Add New Job</a>
-    <table>
-      <tr>
-        <th>Job Title</th>
-        <th>Company</th>
-        <th>Date Created</th>
-        <th>Actions</th>
-      </tr>
-      {% for event in job_events %}
-      <tr>
-        <td>{{ event[1] }}</td>
-        <td>{{ event[2] }}</td>
-        <td>{{ event[3] }}</td>
-        <td>
-          <a href="{{ url_for('view_cover_letter', event_id=event[0]) }}"
-            >View Cover Letter</a
-          >
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+    <div class="container">
+      <h1 class="mt-5">Job Applications</h1>
+      <a href="{{ url_for('add_event') }}" class="btn btn-primary mb-3"
+        >Add New Job</a
+      >
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Date Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for event in job_events %}
+          <tr>
+            <td>{{ event[1] }}</td>
+            <td>{{ event[2] }}</td>
+            <td>{{ event[3] }}</td>
+            <td>
+              <a
+                href="{{ url_for('view_cover_letter', event_id=event[0]) }}"
+                class="btn btn-info btn-sm"
+                >View Cover Letter</a
+              >
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
