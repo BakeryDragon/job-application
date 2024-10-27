@@ -100,9 +100,10 @@ def add_event():
             cursor = conn.cursor()
             cursor.execute(
                 """
-                INSERT INTO job_events (job_title, company_name, job_description, cover_letter, tech_stack, job_duty_summary, date_posted)
+                INSERT INTO job_events (job_title, company_name, job_description, cover_letter, tech_stack, 
+                job_duty_summary, date_posted)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
+                """,
                 (
                     job_title,
                     company_name,
