@@ -31,14 +31,25 @@
           event.preventDefault();
         }
       }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const table = document.querySelector(".table tbody");
+        const rows = Array.from(table.querySelectorAll("tr"));
+
+        rows.sort((a, b) => {
+          const dateA = new Date(a.cells[5].textContent);
+          const dateB = new Date(b.cells[5].textContent);
+          return dateB - dateA; // Sort in descending order
+        });
+
+        rows.forEach(row => table.appendChild(row));
+      });
     </script>
   </head>
   <body>
     <div class="container">
       <h1 class="mt-5">Job Applications</h1>
-      <a href="{{ url_for('add_event') }}" class="btn btn-primary mb-3"
-        >Add New Job</a
-      >
+      <a href="{{ url_for('add_event') }}" class="btn btn-primary mb-3">Add New Job</a>
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -61,20 +72,9 @@
             <td>{{ event[5] }}</td>
             <td>{{ event[6] }}</td>
             <td>
-              <a
-                href="{{ url_for('view_cover_letter', event_id=event[0]) }}"
-                class="btn btn-info btn-sm"
-                >View Cover Letter</a
-              >
-              <form
-                action="{{ url_for('delete_event', event_id=event[0]) }}"
-                method="post"
-                style="display: inline"
-                onsubmit="confirmDelete(event)"
-              >
-                <button type="submit" class="btn btn-danger btn-sm">
-                  Delete
-                </button>
+              <a href="{{ url_for('view_cover_letter', event_id=event[0]) }}" class="btn btn-info btn-sm">View Cover Letter</a>
+              <form action="{{ url_for('delete_event', event_id=event[0]) }}" method="post" style="display: inline" onsubmit="confirmDelete(event)">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
               </form>
             </td>
           </tr>

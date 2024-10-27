@@ -99,11 +99,13 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
 
     # Create directory if it doesn't exist
     output_dir = "data/cover_letter"
+    backup_dir = "C:/Users/Steven/Documents/Resume/Cover letter/Pdf"
     os.makedirs(output_dir, exist_ok=True)
 
     # Save the cover letter as a PDF
     file_name = f"cover_letter_{company_name}_{job_title}.pdf"
     file_path = os.path.join(output_dir, file_name)
+    backup_file_path = os.path.join(backup_dir, file_name)
 
     pdf = FPDF()
     pdf.add_page()
@@ -132,6 +134,7 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
 
     pdf.multi_cell(0, line_height, cover_letter_body)
     pdf.output(file_path)
+    pdf.output(backup_file_path)
 
 
 # Route to create a new job application event
