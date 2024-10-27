@@ -18,15 +18,10 @@
       </h1>
       <div class="card">
         <div class="card-body">
-          <p>{{ job_event[4] }}</p>
-          <p><strong>Tech Stack:</strong> {{ job_event[5] }}</p>
-          <p><strong>Job Duty Summary:</strong> {{ job_event[6] }}</p>
-          <p><strong>Date Posted:</strong> {{ job_event[7] }}</p>
+          <pre style="white-space: pre-wrap;">{{ job_event[4] }}</pre>
         </div>
       </div>
-      <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3"
-        >Back to List</a
-      >
+      <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to List</a>
     </div>
   </body>
 </html>

@@ -6,6 +6,8 @@ import openai
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from openai import OpenAI
+from docx import Document
+from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,11 +18,13 @@ DATABASE = "database.db"
 # Set your OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-JOB_DESCRIPTION_PROMPT = """
-Generate job event data including job_title, company_name, job_description, cover_letter, tech_stack, job_duty_summary, and date_posted 
-based on the provided job description. If you don't find the information in the given job description, just output none. 
-Output the data in JSON format.
-"""
+
+def read_resume(file_path):
+    doc = Document(file_path)
+    full_text = []
+    for para in doc.paragraphs:
+        full_text.append(para.text)
+    return "\n".join(full_text)
 
 
 # Initialize database (run once to create table)
@@ -57,11 +61,15 @@ def query_db(query, args=(), one=False):
 # Function to call OpenAI API and generate job event data
 def generate_job_event_data(job_description):
     client = OpenAI()
+    resume_text = read_resume("data/resume/Resume_JIAWEI_ZHANG_raw.docx")
 
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": JOB_DESCRIPTION_PROMPT},
+            {
+                "role": "system",
+                "content": f"{JOB_DESCRIPTION_PROMPT} /n {COVER_LETTER_PROMPT} /n {resume_text}",
+            },
             {"role": "user", "content": job_description},
         ],
         temperature=1,
