@@ -3,10 +3,12 @@ import os
 import sqlite3
 
 import openai
+from docx import Document
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from openai import OpenAI
-from docx import Document
+from fpdf import FPDF
+
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
 # Load environment variables from .env file
@@ -61,7 +63,14 @@ def query_db(query, args=(), one=False):
 # Function to call OpenAI API and generate job event data
 def generate_job_event_data(job_description, gpt_model="gpt-4o"):
     client = OpenAI()
-    resume_text = read_resume("data/resume/Resume_JIAWEI_ZHANG_raw.docx")
+    resume_folder = os.path.join("data", "resume")
+    resume_files = [f for f in os.listdir(resume_folder) if f.endswith(".docx")]
+
+    if not resume_files:
+        raise FileNotFoundError("No resume files found in the data/resume folder.")
+
+    resume_path = os.path.join(resume_folder, resume_files[0])
+    resume_text = read_resume(resume_path)
 
     response = client.chat.completions.create(
         model=gpt_model,
@@ -81,6 +90,46 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
 
     data = json.loads(response.choices[0].message.content.strip())
     return data
+
+
+from fpdf import FPDF
+import os
+
+def save_cover_letter(company_name, job_title, cover_letter_content):
+    # Remove header (assuming header is the first line)
+    cover_letter_lines = cover_letter_content.split("\n")
+    cover_letter_body = "\n".join(cover_letter_lines)
+
+    # Create directory if it doesn't exist
+    output_dir = "data/cover_letter"
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Save the cover letter as a PDF
+    file_name = f"cover_letter_{company_name}_{job_title}.pdf"
+    file_path = os.path.join(output_dir, file_name)
+
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    # Estimate the number of lines and required height
+    num_lines = len(cover_letter_body.split("\n"))
+    line_height = 10  # Default line height
+    page_height = 297 - 30  # A4 page height minus margins (297mm - 2*15mm)
+    
+    # Adjust font size if content exceeds page height
+    font_size = 12
+    while num_lines * line_height > page_height and font_size > 6:
+        font_size -= 1
+        line_height = font_size * 0.8  # Adjust line height based on font size
+    
+    pdf.set_font("Arial", size=font_size)
+
+    # Ensure the text is encoded in utf-8
+    cover_letter_body = cover_letter_body.encode("utf-8").decode("latin1")
+
+    pdf.multi_cell(0, line_height, cover_letter_body)
+    pdf.output(file_path)
 
 
 # Route to create a new job application event
@@ -124,6 +173,8 @@ def add_event():
                 ),
             )
             conn.commit()
+
+        save_cover_letter(company_name, job_title, cover_letter)
 
         return redirect(url_for("index"))
     return render_template("add_event.html")
