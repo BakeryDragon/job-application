@@ -1,2 +1,2 @@
-# job-search
-An interface to automate the process for searching jobs
+# job-application
+An interface to automate the process for applying jobs
