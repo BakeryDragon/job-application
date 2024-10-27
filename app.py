@@ -59,12 +59,12 @@ def query_db(query, args=(), one=False):
 
 
 # Function to call OpenAI API and generate job event data
-def generate_job_event_data(job_description):
+def generate_job_event_data(job_description, gpt_model="gpt-4o"):
     client = OpenAI()
     resume_text = read_resume("data/resume/Resume_JIAWEI_ZHANG_raw.docx")
 
     response = client.chat.completions.create(
-        model="gpt-4o",
+        model=gpt_model,
         messages=[
             {
                 "role": "system",
@@ -88,9 +88,10 @@ def generate_job_event_data(job_description):
 def add_event():
     if request.method == "POST":
         job_description = request.form["job_description"]
+        gpt_model = request.form["gpt_model"]  # Get selected GPT model
 
         # Generate job event data using OpenAI API
-        job_event_data = generate_job_event_data(job_description)
+        job_event_data = generate_job_event_data(job_description, gpt_model)
 
         job_title = job_event_data["job_title"]
         company_name = job_event_data["company_name"]
