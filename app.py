@@ -26,6 +26,9 @@ def init_db():
                 company_name TEXT,
                 job_description TEXT,
                 cover_letter TEXT,
+                tech_stack TEXT,
+                job_duty_summary TEXT,
+                date_posted DATE,
                 date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
@@ -44,11 +47,13 @@ def generate_job_event_data(job_description):
     client = OpenAI()
     
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {
                 "role": "system",
-                "content": "Generate job event data including job_title, company_name, job_description, and cover_letter based on the provided job description. Output the result in json format."
+                "content": """Generate job event data including job_title, company_name, job_description, cover_letter, tech_stack, 
+                job_duty_summary, and date_posted based on the provided job description. Output the data in JSON format.
+                """
             },
             {
                 "role": "user",
@@ -80,14 +85,17 @@ def add_event():
         job_title = job_event_data['job_title']
         company_name = job_event_data['company_name']
         cover_letter = job_event_data['cover_letter']
+        tech_stack = ','.join(job_event_data['tech_stack'])  # Convert list to comma-separated string
+        job_duty_summary = job_event_data['job_duty_summary']
+        date_posted = job_event_data['date_posted']
 
         # Insert into database
         with sqlite3.connect(DATABASE) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO job_events (job_title, company_name, job_description, cover_letter)
-                VALUES (?, ?, ?, ?)
-            ''', (job_title, company_name, job_description, cover_letter))
+                INSERT INTO job_events (job_title, company_name, job_description, cover_letter, tech_stack, job_duty_summary, date_posted)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (job_title, company_name, job_description, cover_letter, tech_stack, job_duty_summary, date_posted))
             conn.commit()
 
         return redirect(url_for('index'))
@@ -96,7 +104,7 @@ def add_event():
 # Route to view all job applications
 @app.route('/')
 def index():
-    job_events = query_db('SELECT id, job_title, company_name, date_created FROM job_events')
+    job_events = query_db('SELECT id, job_title, company_name, tech_stack, job_duty_summary, date_posted, date_created FROM job_events')
     return render_template('index.html', job_events=job_events)
 
 # Route to fetch and display a specific cover letter
