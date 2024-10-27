@@ -27,6 +27,7 @@ The output should be in JSON format with the following fields:
 - Ensure the cover letter is concise and well-structured, typically in 3-4 paragraphs explaining the candidate's fit for the role.
 - The company name and position name should be extracted from the job description for creating the file name.
 - Check for common cover letter requirements: introduction, relevant experiences, match with company goals/values, and a closing statement.
+- Make sure all information is provided. Don't left optional fields for further edit.
 
 The following is my resume:
 """

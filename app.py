@@ -92,9 +92,6 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
     return data
 
 
-from fpdf import FPDF
-import os
-
 def save_cover_letter(company_name, job_title, cover_letter_content):
     # Remove header (assuming header is the first line)
     cover_letter_lines = cover_letter_content.split("\n")
@@ -110,20 +107,25 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
 
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
-    
+
+    # Set margins
+    margin = 20
+    pdf.set_auto_page_break(auto=True, margin=margin)
+    pdf.set_left_margin(margin)
+    pdf.set_right_margin(margin)
+
     # Estimate the number of lines and required height
     num_lines = len(cover_letter_body.split("\n"))
     line_height = 10  # Default line height
-    page_height = 297 - 30  # A4 page height minus margins (297mm - 2*15mm)
-    
+    page_height = 260 - 2 * margin  
+
     # Adjust font size if content exceeds page height
     font_size = 12
-    while num_lines * line_height > page_height and font_size > 6:
+    while num_lines * line_height > page_height and font_size > 1:
         font_size -= 1
         line_height = font_size * 0.8  # Adjust line height based on font size
-    
-    pdf.set_font("Arial", size=font_size)
+
+    pdf.set_font("Times", size=font_size)
 
     # Ensure the text is encoded in utf-8
     cover_letter_body = cover_letter_body.encode("utf-8").decode("latin1")

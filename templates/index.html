@@ -10,6 +10,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <title>Job Applications</title>
+    <style>
+      /* Set maximum width for specific columns */
+      .table th.tech-stack,
+      .table td.tech-stack {
+        max-width: 200px;
+        word-wrap: break-word;
+        white-space: normal;
+      }
+      .table th.job-duty,
+      .table td.job-duty {
+        max-width: 300px;
+        word-wrap: break-word;
+        white-space: normal;
+      }
+    </style>
     <script>
       function confirmDelete(event) {
         if (!confirm("Are you sure you want to delete this job event?")) {
@@ -29,8 +44,8 @@
           <tr>
             <th>Job Title</th>
             <th>Company</th>
-            <th>Tech Stack</th>
-            <th>Job Duty Summary</th>
+            <th class="tech-stack">Tech Stack</th>
+            <th class="job-duty">Job Duty Summary</th>
             <th>Date Posted</th>
             <th>Date Created</th>
             <th>Actions</th>
@@ -41,8 +56,8 @@
           <tr>
             <td>{{ event[1] }}</td>
             <td>{{ event[2] }}</td>
-            <td>{{ event[3] }}</td>
-            <td>{{ event[4] }}</td>
+            <td class="tech-stack">{{ event[3] }}</td>
+            <td class="job-duty">{{ event[4] }}</td>
             <td>{{ event[5] }}</td>
             <td>{{ event[6] }}</td>
             <td>
