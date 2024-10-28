@@ -2,3 +2,4 @@
 .pylintrc
 database.db
 data
+*.ipynb
