@@ -6,8 +6,8 @@ import openai
 from docx import Document
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
-from openai import OpenAI
 from fpdf import FPDF
+from openai import OpenAI
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -119,7 +119,7 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
     # Estimate the number of lines and required height
     num_lines = len(cover_letter_body.split("\n"))
     line_height = 10  # Default line height
-    page_height = 260 - 2 * margin  
+    page_height = 260 - 2 * margin
 
     # Adjust font size if content exceeds page height
     font_size = 12
