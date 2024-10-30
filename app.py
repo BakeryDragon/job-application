@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from fpdf import FPDF
 from openai import OpenAI
-import PyPDF2
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -27,19 +26,13 @@ def read_resume(file_path):
     
     if file_extension == '.docx':
         doc = Document(file_path)
-        full_text = []
-        for para in doc.paragraphs:
-            full_text.append(para.text)
+        full_text = [para.text for para in doc.paragraphs]
         return "\n".join(full_text)
     
     elif file_extension == '.pdf':
-        full_text = []
-        with open(file_path, 'rb') as file:
-            reader = PyPDF2.PdfFileReader(file)
-            for page_num in range(reader.numPages):
-                page = reader.getPage(page_num)
-                full_text.append(page.extract_text())
-        return "\n".join(full_text)
+        from pdfminer.high_level import extract_text
+        text = extract_text(file_path)
+        return text
     
     else:
         raise ValueError("Unsupported file format")
@@ -150,7 +143,10 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
 
     pdf.multi_cell(0, line_height, cover_letter_body)
     pdf.output(file_path)
-    pdf.output(backup_file_path)
+    try:
+        pdf.output(backup_file_path)
+    except FileNotFoundError:
+        print("Backup file path not found")
 
 
 # Route to create a new job application event
