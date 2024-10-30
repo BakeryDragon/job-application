@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from fpdf import FPDF
 from openai import OpenAI
+import PyPDF2
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -22,11 +23,26 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 def read_resume(file_path):
-    doc = Document(file_path)
-    full_text = []
-    for para in doc.paragraphs:
-        full_text.append(para.text)
-    return "\n".join(full_text)
+    file_extension = os.path.splitext(file_path)[1].lower()
+    
+    if file_extension == '.docx':
+        doc = Document(file_path)
+        full_text = []
+        for para in doc.paragraphs:
+            full_text.append(para.text)
+        return "\n".join(full_text)
+    
+    elif file_extension == '.pdf':
+        full_text = []
+        with open(file_path, 'rb') as file:
+            reader = PyPDF2.PdfFileReader(file)
+            for page_num in range(reader.numPages):
+                page = reader.getPage(page_num)
+                full_text.append(page.extract_text())
+        return "\n".join(full_text)
+    
+    else:
+        raise ValueError("Unsupported file format")
 
 
 # Initialize database (run once to create table)
@@ -64,7 +80,7 @@ def query_db(query, args=(), one=False):
 def generate_job_event_data(job_description, gpt_model="gpt-4o"):
     client = OpenAI()
     resume_folder = os.path.join("data", "resume")
-    resume_files = [f for f in os.listdir(resume_folder) if f.endswith(".docx")]
+    resume_files = [f for f in os.listdir(resume_folder) if f.endswith((".docx", ".pdf"))]
 
     if not resume_files:
         raise FileNotFoundError("No resume files found in the data/resume folder.")
