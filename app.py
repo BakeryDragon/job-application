@@ -10,6 +10,8 @@ from flask import Flask, redirect, render_template, request, url_for
 from fpdf import FPDF
 from openai import OpenAI
 from pdfminer.high_level import extract_text
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -155,6 +157,15 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
         print("Backup file path not found")
 
 
+class JobEventData(BaseModel):
+    job_title: str = Field(default="Unknown Title")
+    company_name: str = Field(default="Unknown Company")
+    cover_letter: Optional[str] = Field(default="")
+    tech_stack: Optional[List[str]] = Field(default=None)
+    job_duty_summary: Optional[str] = Field(default="")
+    date_posted: Optional[str] = Field(default="")
+
+
 # Route to create a new job application event
 @app.route("/add", methods=["GET", "POST"])
 def add_event():
@@ -165,16 +176,19 @@ def add_event():
         # Generate job event data using OpenAI API
         job_event_data = generate_job_event_data(job_description, gpt_model)
 
-        job_title = job_event_data["job_title"]
-        company_name = job_event_data["company_name"]
-        cover_letter = job_event_data["cover_letter"]
+        # Parse and validate the job event data using Pydantic
+        job_event = JobEventData(**job_event_data)
+
+        job_title = job_event.job_title
+        company_name = job_event.company_name
+        cover_letter = job_event.cover_letter
         tech_stack = (
-            ",".join(job_event_data["tech_stack"])
-            if job_event_data["tech_stack"]
+            ",".join(job_event.tech_stack)
+            if job_event.tech_stack
             else None
         )  # Convert list to comma-separated string or set to None
-        job_duty_summary = job_event_data["job_duty_summary"]
-        date_posted = job_event_data["date_posted"]
+        job_duty_summary = job_event.job_duty_summary
+        date_posted = job_event.date_posted
 
         # Insert into database
         with sqlite3.connect(DATABASE) as conn:
