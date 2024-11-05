@@ -23,17 +23,18 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def read_resume(file_path):
     file_extension = os.path.splitext(file_path)[1].lower()
-    
-    if file_extension == '.docx':
+
+    if file_extension == ".docx":
         doc = Document(file_path)
         full_text = [para.text for para in doc.paragraphs]
         return "\n".join(full_text)
-    
-    elif file_extension == '.pdf':
+
+    elif file_extension == ".pdf":
         from pdfminer.high_level import extract_text
+
         text = extract_text(file_path)
         return text
-    
+
     else:
         raise ValueError("Unsupported file format")
 
@@ -73,7 +74,9 @@ def query_db(query, args=(), one=False):
 def generate_job_event_data(job_description, gpt_model="gpt-4o"):
     client = OpenAI()
     resume_folder = os.path.join("data", "resume")
-    resume_files = [f for f in os.listdir(resume_folder) if f.endswith((".docx", ".pdf"))]
+    resume_files = [
+        f for f in os.listdir(resume_folder) if f.endswith((".docx", ".pdf"))
+    ]
 
     if not resume_files:
         raise FileNotFoundError("No resume files found in the data/resume folder.")
@@ -102,6 +105,9 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
 
 
 def save_cover_letter(company_name, job_title, cover_letter_content):
+    company_name = re.sub(r"[^a-zA-Z]", "", company_name)
+    job_title = re.sub(r"[^a-zA-Z]", "", job_title)
+    
     # Remove header (assuming header is the first line)
     cover_letter_lines = cover_letter_content.split("\n")
     cover_letter_body = "\n".join(cover_letter_lines)
