@@ -35,12 +35,12 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 def read_resume(file_path):
     file_extension = os.path.splitext(file_path)[1].lower()
 
-    if (file_extension == ".docx"):
+    if file_extension == ".docx":
         doc = Document(file_path)
         full_text = [para.text for para in doc.paragraphs]
         return "\n".join(full_text)
 
-    elif (file_extension == ".pdf"):
+    elif file_extension == ".pdf":
         text = extract_text(file_path)
         return text
 
@@ -278,7 +278,7 @@ def generate_plots():
         """
         )
         tech_stack_data = cursor.fetchall()
-    
+
     # Plot total amount of jobs applied grouped by days
     dates, counts = zip(*jobs_by_day)
     plt.figure(figsize=(10, 5))
@@ -292,24 +292,30 @@ def generate_plots():
     plt.savefig(img1, format="png")
     img1.seek(0)
     img1_base64 = base64.b64encode(img1.getvalue()).decode()
-    
+
     # Plot breakdown of amount jobs applied by company
     companies, counts = zip(*jobs_by_company)
-    plt.figure(figsize=(10, len(companies) * 0.5))  # Adjust figure height based on number of companies
+    plt.figure(
+        figsize=(10, len(companies) * 0.5)
+    )  # Adjust figure height based on number of companies
     plt.barh(companies, counts)  # Change to horizontal bar plot
     plt.title("Jobs Applied by Company")
     plt.xlabel("Number of Jobs")
     plt.ylabel("Company")
     plt.tight_layout()
-    plt.subplots_adjust(left=0.3)  # Adjust left margin to add more space for company names
+    plt.subplots_adjust(
+        left=0.3
+    )  # Adjust left margin to add more space for company names
     img2 = io.BytesIO()
     plt.savefig(img2, format="png")
     img2.seek(0)
     img2_base64 = base64.b64encode(img2.getvalue()).decode()
-    
+
     # Generate word cloud for tech stack
     tech_stack_text = " ".join([tech for tech, in tech_stack_data if tech])
-    wordcloud = WordCloud(width=800, height=400, background_color="white").generate(tech_stack_text)
+    wordcloud = WordCloud(width=800, height=400, background_color="white").generate(
+        tech_stack_text
+    )
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
@@ -318,14 +324,18 @@ def generate_plots():
     plt.savefig(img3, format="png")
     img3.seek(0)
     img3_base64 = base64.b64encode(img3.getvalue()).decode()
-    
+
     return img1_base64, img2_base64, img3_base64
+
 
 @app.route("/plots")
 def plots():
     img1_base64, img2_base64, img3_base64 = generate_plots()
     return render_template(
-        "plots.html", img1_base64=img1_base64, img2_base64=img2_base64, img3_base64=img3_base64
+        "plots.html",
+        img1_base64=img1_base64,
+        img2_base64=img2_base64,
+        img3_base64=img3_base64,
     )
 
 
