@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sqlite3
 
 import openai
@@ -8,6 +9,7 @@ from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request, url_for
 from fpdf import FPDF
 from openai import OpenAI
+from pdfminer.high_level import extract_text
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -30,8 +32,6 @@ def read_resume(file_path):
         return "\n".join(full_text)
 
     elif file_extension == ".pdf":
-        from pdfminer.high_level import extract_text
-
         text = extract_text(file_path)
         return text
 
@@ -107,7 +107,7 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
 def save_cover_letter(company_name, job_title, cover_letter_content):
     company_name = re.sub(r"[^a-zA-Z]", "", company_name)
     job_title = re.sub(r"[^a-zA-Z]", "", job_title)
-    
+
     # Remove header (assuming header is the first line)
     cover_letter_lines = cover_letter_content.split("\n")
     cover_letter_body = "\n".join(cover_letter_lines)
