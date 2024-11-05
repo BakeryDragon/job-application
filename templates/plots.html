@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Job Application Plots</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="mt-5">Job Application Plots</h1>
+      <div class="mt-3">
+        <h2>Total Jobs Applied by Day</h2>
+        <img src="data:image/png;base64,{{ img1_base64 }}" class="img-fluid" alt="Total Jobs Applied by Day">
+      </div>
+      <div class="mt-3">
+        <h2>Jobs Applied by Company</h2>
+        <img src="data:image/png;base64,{{ img2_base64 }}" class="img-fluid" alt="Jobs Applied by Company">
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to List</a>
+    </div>
+  </body>
+</html>

@@ -1,17 +1,20 @@
+import base64
+import io
 import json
 import os
 import re
 import sqlite3
+from typing import List, Optional
 
+import matplotlib.pyplot as plt
 import openai
 from docx import Document
 from dotenv import load_dotenv
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, Response, redirect, render_template, request, url_for
 from fpdf import FPDF
 from openai import OpenAI
 from pdfminer.high_level import extract_text
 from pydantic import BaseModel, Field
-from typing import List, Optional
 
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
@@ -183,9 +186,7 @@ def add_event():
         company_name = job_event.company_name
         cover_letter = job_event.cover_letter
         tech_stack = (
-            ",".join(job_event.tech_stack)
-            if job_event.tech_stack
-            else None
+            ",".join(job_event.tech_stack) if job_event.tech_stack else None
         )  # Convert list to comma-separated string or set to None
         job_duty_summary = job_event.job_duty_summary
         date_posted = job_event.date_posted
@@ -223,7 +224,8 @@ def index():
     job_events = query_db(
         "SELECT id, job_title, company_name, tech_stack, job_duty_summary, date_posted, date_created FROM job_events"
     )
-    return render_template("index.html", job_events=job_events)
+    total_jobs = len(job_events)
+    return render_template("index.html", job_events=job_events, total_jobs=total_jobs)
 
 
 # Route to fetch and display a specific cover letter
@@ -240,6 +242,70 @@ def delete_event(event_id):
         cursor.execute("DELETE FROM job_events WHERE id = ?", (event_id,))
         conn.commit()
     return redirect(url_for("index"))
+
+
+# Function to generate the plots
+def generate_plots():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+
+        # Query to get the total amount of jobs applied grouped by days
+        cursor.execute(
+            """
+            SELECT date(date_created), COUNT(*) 
+            FROM job_events 
+            GROUP BY date(date_created)
+        """
+        )
+        jobs_by_day = cursor.fetchall()
+
+        # Query to get the breakdown of amount jobs applied by company
+        cursor.execute(
+            """
+            SELECT company_name, COUNT(*) 
+            FROM job_events 
+            GROUP BY company_name
+        """
+        )
+        jobs_by_company = cursor.fetchall()
+
+    # Plot total amount of jobs applied grouped by days
+    dates, counts = zip(*jobs_by_day)
+    plt.figure(figsize=(10, 5))
+    plt.plot(dates, counts, marker="o")
+    plt.title("Total Jobs Applied by Day")
+    plt.xlabel("Date")
+    plt.ylabel("Number of Jobs")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    img1 = io.BytesIO()
+    plt.savefig(img1, format="png")
+    img1.seek(0)
+    img1_base64 = base64.b64encode(img1.getvalue()).decode()
+
+    # Plot breakdown of amount jobs applied by company
+    companies, counts = zip(*jobs_by_company)
+    plt.figure(figsize=(10, 5))
+    plt.bar(companies, counts)
+    plt.title("Jobs Applied by Company")
+    plt.xlabel("Company")
+    plt.ylabel("Number of Jobs")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    img2 = io.BytesIO()
+    plt.savefig(img2, format="png")
+    img2.seek(0)
+    img2_base64 = base64.b64encode(img2.getvalue()).decode()
+
+    return img1_base64, img2_base64
+
+
+@app.route("/plots")
+def plots():
+    img1_base64, img2_base64 = generate_plots()
+    return render_template(
+        "plots.html", img1_base64=img1_base64, img2_base64=img2_base64
+    )
 
 
 if __name__ == "__main__":
