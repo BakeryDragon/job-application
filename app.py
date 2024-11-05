@@ -1,4 +1,5 @@
 from flask import Flask
+
 from database import init_db
 from routes import routes
 
