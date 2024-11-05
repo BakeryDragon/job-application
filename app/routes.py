@@ -3,11 +3,11 @@ import sqlite3
 from flask import Blueprint, redirect, render_template, request, url_for
 from openai import OpenAI
 
-from app.config import DATABASE
 from app.database import query_db
 from app.models import JobEventData
 from app.utils import (generate_job_event_data, generate_plots,
                        save_cover_letter)
+from config import DATABASE
 
 routes = Blueprint("routes", __name__)
 client = OpenAI()

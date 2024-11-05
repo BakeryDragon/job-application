@@ -13,8 +13,8 @@ from openai import OpenAI
 from pdfminer.high_level import extract_text
 from wordcloud import WordCloud
 
-from app.config import DATABASE
 from app.prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
+from config import DATABASE
 
 matplotlib.use("Agg")  # Use a non-GUI backend
 
