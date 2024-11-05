@@ -13,10 +13,10 @@ from openai import OpenAI
 from pdfminer.high_level import extract_text
 from wordcloud import WordCloud
 
+from config import DATABASE
 from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
 matplotlib.use("Agg")  # Use a non-GUI backend
-DATABASE = "database.db"
 
 
 def read_resume(file_path):
