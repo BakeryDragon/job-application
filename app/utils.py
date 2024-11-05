@@ -96,7 +96,11 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
         response_format={"type": "json_object"},
     )
 
-    if response.choices and response.choices[0].message and response.choices[0].message.content:
+    if (
+        response.choices
+        and response.choices[0].message
+        and response.choices[0].message.content
+    ):
         data = json.loads(response.choices[0].message.content.strip())
         return data
     else:
