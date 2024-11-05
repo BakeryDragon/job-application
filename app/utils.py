@@ -13,8 +13,8 @@ from openai import OpenAI
 from pdfminer.high_level import extract_text
 from wordcloud import WordCloud
 
-from config import DATABASE
-from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
+from app.config import DATABASE
+from app.prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
 matplotlib.use("Agg")  # Use a non-GUI backend
 
@@ -96,8 +96,11 @@ def generate_job_event_data(job_description, gpt_model="gpt-4o"):
         response_format={"type": "json_object"},
     )
 
-    data = json.loads(response.choices[0].message.content.strip())
-    return data
+    if response.choices and response.choices[0].message and response.choices[0].message.content:
+        data = json.loads(response.choices[0].message.content.strip())
+        return data
+    else:
+        raise ValueError("Invalid response from OpenAI API")
 
 
 def generate_plots():

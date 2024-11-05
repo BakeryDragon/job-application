@@ -12,4 +12,4 @@ format: black isort
 .PHONY: black isort format
 
 start:
-	python app.py
+	python run.py

@@ -1,7 +1,7 @@
 from flask import Flask
 
-from database import init_db
-from routes import routes
+from app.database import init_db
+from app.routes import routes
 
 app = Flask(__name__)
 app.register_blueprint(routes)
