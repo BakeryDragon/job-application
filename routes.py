@@ -1,11 +1,14 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from database import query_db
-from models import JobEventData
-from utils import read_resume, save_cover_letter, generate_job_event_data, generate_plots
-from openai import OpenAI
 import json
 import os
 import sqlite3
+
+from flask import Blueprint, redirect, render_template, request, url_for
+from openai import OpenAI
+
+from database import query_db
+from models import JobEventData
+from utils import (generate_job_event_data, generate_plots, read_resume,
+                   save_cover_letter)
 
 routes = Blueprint("routes", __name__)
 client = OpenAI()

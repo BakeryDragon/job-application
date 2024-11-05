@@ -1,15 +1,12 @@
-# Define the directories to format
-SRC_FILES = app.py prompt.py
-
-# Target to run black
+# Run black on all Python files in the current directory
 black:
-	black $(SRC_FILES)
+	black .
 
-# Target to run isort
+# Run isort on all Python files in the current directory
 isort:
-	isort $(SRC_FILES)
+	isort .
 
-# Target to run both black and isort
+# Run both black and isort
 format: black isort
 
 .PHONY: black isort format

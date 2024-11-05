@@ -1,17 +1,19 @@
-import os
 import base64
 import io
-import re
 import json
+import os
+import re
 import sqlite3
-from openai import OpenAI
-from docx import Document
-from pdfminer.high_level import extract_text
-from fpdf import FPDF
-from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
-import matplotlib.pyplot as plt
-from wordcloud import WordCloud
+
 import matplotlib
+import matplotlib.pyplot as plt
+from docx import Document
+from fpdf import FPDF
+from openai import OpenAI
+from pdfminer.high_level import extract_text
+from wordcloud import WordCloud
+
+from prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
 
 matplotlib.use("Agg")  # Use a non-GUI backend
 DATABASE = "database.db"
