@@ -14,7 +14,7 @@ from pdfminer.high_level import extract_text
 from wordcloud import WordCloud
 
 from app.prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
-from config import DATABASE
+from config import DATABASE, BACKUP_DIR
 
 matplotlib.use("Agg")  # Use a non-GUI backend
 
@@ -37,11 +37,14 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
     job_title = re.sub(r"[^a-zA-Z]", "", job_title)
     cover_letter_body = "\n".join(cover_letter_content.split("\n"))
     output_dir = "data/cover_letter"
-    backup_dir = "C:/Users/Steven/Documents/Resume/Cover letter/Pdf"
+    backup_dir = BACKUP_DIR
     os.makedirs(output_dir, exist_ok=True)
     file_name = f"cover_letter_{company_name}_{job_title}.pdf"
     file_path = os.path.join(output_dir, file_name)
-    backup_file_path = os.path.join(backup_dir, file_name)
+    if backup_dir:
+        backup_file_path = os.path.join(backup_dir, file_name)
+    else:
+        backup_file_path = None
     pdf = FPDF()
     pdf.add_page()
     margin = 20
