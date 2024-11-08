@@ -12,6 +12,7 @@ An interface to automate the process for applying jobs.
 1. Clone the Repository
 
    git clone https://github.com/BakeryDragon/job-application.git
+
    cd job-application
 
 2. Create a Virtual Environment
@@ -21,8 +22,11 @@ An interface to automate the process for applying jobs.
 3. Activate the Virtual Environment
 
    - On Windows:
-     .\.venv\Scripts\activate
+
+     . \.venv\Scripts\activate
+
    - On macOS/Linux:
+
      source .venv/bin/activate
 
 4. Install Dependencies
@@ -34,6 +38,7 @@ An interface to automate the process for applying jobs.
    Create a .env file in the root directory of the project and add the following environment variables:
 
    OPENAI_API_KEY=your_openai_api_key
+   
    BACKUP_DIR=path_to_backup_directory
 
 6. Run the Application

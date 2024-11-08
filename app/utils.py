@@ -14,7 +14,7 @@ from pdfminer.high_level import extract_text
 from wordcloud import WordCloud
 
 from app.prompt import COVER_LETTER_PROMPT, JOB_DESCRIPTION_PROMPT
-from config import DATABASE, BACKUP_DIR
+from config import BACKUP_DIR, DATABASE
 
 matplotlib.use("Agg")  # Use a non-GUI backend
 
