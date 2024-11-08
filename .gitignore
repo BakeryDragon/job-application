@@ -1,6 +1,7 @@
 .env
 .pylintrc
 database.db
-data
+data/resume/*
+data/cover_letter/*
 *.ipynb
 scripts
