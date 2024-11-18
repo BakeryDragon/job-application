@@ -1,5 +1,6 @@
 .env
-.pylintrc
+.pylintrc\
+app/__pycache__/
 database.db
 data/resume/*
 data/cover_letter/*
