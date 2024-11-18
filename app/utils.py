@@ -66,7 +66,7 @@ def save_cover_letter(company_name, job_title, cover_letter_content):
     pdf.output(file_path)
     try:
         pdf.output(backup_file_path)
-    except FileNotFoundError:
+    except TypeError:
         print("Backup file path not found")
 
 
